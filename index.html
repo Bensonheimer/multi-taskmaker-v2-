@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07111f">
+<title>Multi TaskMaker</title>
+<style>
+:root{--bg:#07111f;--panel:rgba(14,28,49,.78);--line:rgba(110,190,255,.22);--blue:#55c8ff;--violet:#9c83ff;--text:#eff7ff;--muted:#9bb0ca;--tile-alpha:.78}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+body{overflow-x:hidden;background:radial-gradient(ellipse at 20% 10%,#172e57 0%,transparent 38%),radial-gradient(ellipse at 90% 70%,#251b4b 0%,transparent 40%),#07111f}
+#scene{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:linear-gradient(180deg,rgba(4,10,23,.2),rgba(4,10,23,.58))}
+.star{position:absolute;width:2px;height:2px;border-radius:50%;background:#e9f8ff;box-shadow:0 0 9px #8edbff;animation:twinkle 3s infinite alternate}
+@keyframes twinkle{from{opacity:.25;transform:scale(.7)}to{opacity:1;transform:scale(1.4)}}
+#galaxy{position:absolute;width:75vw;height:75vw;max-width:780px;max-height:780px;left:50%;top:42%;transform:translate(-50%,-50%);border-radius:50%;background:repeating-radial-gradient(ellipse at 48% 48%,transparent 0 12px,rgba(113,115,255,.12) 14px 17px,transparent 21px 34px),radial-gradient(ellipse,#6d66d9 0%,#273a79 12%,rgba(49,65,134,.35) 28%,transparent 65%);filter:blur(2px);opacity:.6;animation:drift 42s linear infinite}
+@keyframes drift{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.fish{position:absolute;font-size:26px;filter:drop-shadow(0 0 8px #57cfff);animation:swim 17s linear infinite}
+@keyframes swim{0%{transform:translateX(-15vw) scaleX(1)}48%{transform:translateX(105vw) scaleX(1)}50%{transform:translateX(105vw) scaleX(-1)}98%{transform:translateX(-15vw) scaleX(-1)}100%{transform:translateX(-15vw) scaleX(1)}}
+.bubble{position:absolute;border:1px solid rgba(141,228,255,.65);border-radius:50%;animation:rise 9s linear infinite}
+@keyframes rise{from{transform:translateY(15vh);opacity:0}15%{opacity:.8}to{transform:translateY(-115vh);opacity:0}}
+.app{position:relative;z-index:1;max-width:980px;margin:auto;padding:calc(16px + env(safe-area-inset-top)) 16px calc(26px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:12px}.brandmark{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#163b69,#4d3f91);border:1px solid #69ceff80;box-shadow:0 0 24px #259dff35;font-size:23px}
+h1{font-size:18px;letter-spacing:.09em;margin:0;font-weight:850}.sub{font-size:11px;color:var(--blue);letter-spacing:.14em;margin-top:4px}
+.iconbtn,.backbtn{border:1px solid var(--line);background:rgba(16,32,55,.8);color:var(--text);border-radius:13px;padding:11px 13px;font-size:15px}
+h2{font-size:25px;margin:0 0 7px;letter-spacing:-.03em}p{color:var(--muted);line-height:1.5;margin:0 0 18px}.eyebrow{color:var(--blue);text-transform:uppercase;letter-spacing:.15em;font-size:11px;font-weight:800;margin-bottom:9px}
+.hero{padding:23px;border:1px solid var(--line);border-radius:25px;background:linear-gradient(135deg,rgba(22,47,80,.72),rgba(31,24,68,.54));box-shadow:0 15px 55px #0003;margin-bottom:20px;overflow:hidden;position:relative}
+.hero:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-60px;top:-65px;background:radial-gradient(circle,#5fcaff38,transparent 68%)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tile{color:var(--text);text-align:left;border:1px solid var(--line);border-radius:20px;padding:17px 15px;min-height:132px;background:rgba(13,28,49,var(--tile-alpha));backdrop-filter:blur(15px);box-shadow:0 9px 30px #0002;transition:transform .18s,border-color .18s;cursor:pointer}
+.tile:active{transform:scale(.98)}.tile:hover{border-color:#62cfff88}.tileicon{width:45px;height:45px;border-radius:15px;display:grid;place-items:center;font-size:24px;margin-bottom:14px;background:linear-gradient(135deg,#16416a,#42346f);border:1px solid #7bd5ff40}.tile strong{display:block;font-size:15px}.tile small{display:block;color:var(--muted);font-size:12px;margin-top:5px;line-height:1.35}
+.page{display:none}.page.active{display:block}.sectionhead{display:flex;align-items:center;gap:10px;margin:0 0 20px}
+.card{border:1px solid var(--line);border-radius:20px;padding:17px;background:rgba(10,23,42,.76);backdrop-filter:blur(14px);margin-bottom:13px}
+.row{display:flex;align-items:center;gap:12px}.row .grow{flex:1;min-width:0}.row strong{display:block}.muted{font-size:12px;color:var(--muted);line-height:1.45}
+.action{border:1px solid #65caff66;border-radius:13px;padding:11px 14px;color:#effaff;background:linear-gradient(135deg,#164b78,#38316e);font-weight:700;cursor:pointer}
+.action.secondary{background:rgba(20,38,62,.85);border-color:var(--line)}.action:active{transform:scale(.98)}
+.appicon{width:54px;height:54px;border-radius:15px;display:grid;place-items:center;background:#f7f9fc;color:#111;font-size:27px;font-weight:900;flex-shrink:0;overflow:hidden}.appicon img{width:100%;height:100%;object-fit:cover}.roblox{background:#111;color:white}.google{font-size:30px;background:white;color:#4285f4}
+.soundgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.sound{min-height:78px;display:flex;align-items:center;gap:10px;text-align:left}.sound .sicon{font-size:21px}
+label{display:block;font-size:13px;color:#c7d8ec;margin:15px 0 8px}input[type=range],select{width:100%;accent-color:#52c9ff}select{background:#12233b;color:var(--text);border:1px solid var(--line);padding:12px;border-radius:12px}
+.switchrow{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px solid #ffffff10}.switchrow:last-child{border:0}
+input[type=checkbox]{appearance:none;width:46px;height:27px;border-radius:99px;background:#33445a;position:relative;transition:.2s;flex-shrink:0}
+input[type=checkbox]:before{content:"";position:absolute;width:21px;height:21px;left:3px;top:3px;border-radius:50%;background:white;transition:.2s}
+input[type=checkbox]:checked{background:#168bce}input[type=checkbox]:checked:before{left:22px}
+.battery{width:100%;height:74px;border:3px solid #a9c5e6;border-radius:16px;padding:6px;position:relative;margin:18px 0 12px}
+.battery:after{content:"";position:absolute;right:-9px;top:22px;width:6px;height:25px;border-radius:0 4px 4px 0;background:#a9c5e6}
+.batteryfill{height:100%;width:78%;border-radius:8px;background:linear-gradient(90deg,#27d6b2,#6be8a2);box-shadow:0 0 20px #39e2bc80;transition:width .5s}
+.fpsnum{font-size:54px;font-weight:850;letter-spacing:-.06em;color:#70d5ff;text-shadow:0 0 24px #2daaff66}
+.gamearea{height:250px;border-radius:17px;background:radial-gradient(ellipse at 50% 20%,#284f85,#111a36 75%);border:1px solid var(--line);position:relative;overflow:hidden;touch-action:manipulation}
+.orb{position:absolute;border-radius:50%;background:radial-gradient(circle at 30% 28%,#fff,#71d8ff 20%,#4266dc 62%,#30205b);box-shadow:0 0 24px #58bfff99;cursor:pointer}
+.bubblebtn{width:66px;height:66px;border-radius:50%;border:1px solid #b2f3ffb0;background:radial-gradient(circle at 35% 25%,#e7fcffb0,#55b7ff44 60%,#182a61aa);box-shadow:inset 0 0 12px #fff8,0 0 18px #51caff35;cursor:pointer}
+.toast{position:fixed;z-index:10;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#142946;border:1px solid #69ceff66;padding:12px 16px;border-radius:13px;box-shadow:0 8px 35px #0008;font-size:13px;display:none;max-width:90%;text-align:center}
+footer{text-align:center;color:#7f95b2;font-size:11px;margin-top:24px;line-height:1.5}
+@media(min-width:680px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.soundgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.tile{min-height:150px}.app{padding-left:24px;padding-right:24px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div id="scene"><div id="galaxy"></div></div>
+<div class="app">
+<header>
+  <div class="brand"><div class="brandmark">✦</div><div><h1>MULTI TASKMAKER</h1><div class="sub">YOUR PERSONAL GAME HUB</div></div></div>
+  <button class="iconbtn" onclick="showPage('settings')" aria-label="Einstellungen">⚙</button>
+</header>
+
+<main>
+<section id="home" class="page active">
+  <div class="hero"><div class="eyebrow">Dein Kontrollzentrum</div><h2>Alles an einem Ort.</h2><p>Spiele, Sounds und kleine kreative Tools – in deinem Neon-Universum.</p><div class="muted">Wähle einen Bereich, um loszulegen.</div></div>
+  <div class="grid">
+    <button class="tile" onclick="showPage('games')"><div class="tileicon">🎮</div><strong>Game Center</strong><small>Spiele und Apps starten</small></button>
+    <button class="tile" onclick="showPage('soundboard')"><div class="tileicon">♫</div><strong>Soundboard</strong><small>Meme-Sounds und Effekte</small></button>
+    <button class="tile" onclick="showPage('asmr')"><div class="tileicon">✧</div><strong>ASMR-Spiele</strong><small>Entspannen und ausprobieren</small></button>
+    <button class="tile" onclick="showPage('battery')"><div class="tileicon">▰</div><strong>Akku-Design</strong><small>Futuristische Batterieanzeige</small></button>
+    <button class="tile" onclick="showPage('fps')"><div class="tileicon">◉</div><strong>FPS-Anzeige</strong><small>FPS dieser App messen</small></button>
+    <button class="tile" onclick="showPage('settings')"><div class="tileicon">⚙</div><strong>Einstellungen</strong><small>Hintergrund und Layout</small></button>
+  </div>
+</section>
+
+<section id="games" class="page">
+  <div class="sectionhead"><button class="backbtn" onclick="showPage('home')">←</button><div><div class="eyebrow">Deine Sammlung</div><h2>Game Center</h2></div></div>
+  <p>Tippe auf eine Kachel, um die App zu öffnen. Auf iPhone funktioniert das nur, wenn die jeweilige App passende Links unterstützt.</p>
+  <div class="card row"><div class="appicon roblox">◇</div><div class="grow"><strong>Roblox</strong><div class="muted">Direktstart versuchen</div></div><button class="action" onclick="openGame('roblox')">Öffnen ↗</button></div>
+  <div class="card row"><div class="appicon google">G</div><div class="grow"><strong>Google</strong><div class="muted">Google-App öffnen, falls unterstützt</div></div><button class="action" onclick="openGame('google')">Öffnen ↗</button></div>
+  <div class="card row"><div class="appicon" style="background:linear-gradient(135deg,#17385b,#3e2b68);color:#78d9ff">＋</div><div class="grow"><strong>Weitere Apps</strong><div class="muted">Du kannst später weitere Apps nennen.</div></div></div>
+  <div class="card muted">Hinweis: App-Links und URL-Schemata unterscheiden sich je nach App und iOS-Version. Wenn ein Direktlink nicht funktioniert, muss dafür ein anderer unterstützter Link gefunden werden. Diese Web-App kann nicht jede installierte App beliebig starten.</div>
+</section>
+
+<section id="soundboard" class="page">
+  <div class="sectionhead"><button class="backbtn" onclick="showPage('home')">←</button><div><div class="eyebrow">Audio-Labor</div><h2>Soundboard</h2></div></div>
+  <p>Diese Vorschau spielt einfache synthetische Platzhalter-Effekte ab. Die originalen Meme-Audiodateien sind noch nicht eingebaut.</p>
+  <div class="soundgrid" id="sounds"></div>
+  <div class="card"><strong>Eigene Audiodatei testen</strong><p class="muted" style="margin:6px 0 12px">Wähle eine Audiodatei von deinem Gerät. Sie wird nicht hochgeladen.</p><input id="audioFile" type="file" accept="audio/*" style="max-width:100%;color:#c9d8eb"><audio id="customAudio" controls style="width:100%;margin-top:12px;display:none"></audio></div>
+</section>
+
+<section id="asmr" class="page">
+  <div class="sectionhead"><button class="backbtn" onclick="showPage('home')">←</button><div><div class="eyebrow">Satisfying Zone</div><h2>ASMR-Spiele</h2></div></div>
+  <p>Offline-fähige kleine Spielideen in dieser Vorschau. Tippe auf die Blasen oder berühre die Fläche.</p>
+  <div class="card"><strong>Bubble Pop</strong><div class="muted" style="margin:5px 0 12px">Getippte Blasen verschwinden – ohne Punkte-Druck.</div><div id="bubbleGame" class="gamearea" aria-label="Bubble Pop Spiel"></div><button class="action secondary" style="margin-top:12px" onclick="resetBubbles()">Neue Blasen</button></div>
+  <div class="card"><strong>Farb-Sortierer</strong><div class="muted" style="margin:5px 0 12px">Tippe die Kugeln an, um ihre Farbe zu ändern.</div><div class="row" id="colorGame" style="justify-content:space-around;flex-wrap:wrap;min-height:78px"></div></div>
+</section>
+
+<section id="battery" class="page">
+  <div class="sectionhead"><button class="backbtn" onclick="showPage('home')">←</button><div><div class="eyebrow">Power Lab</div><h2>Akku-Design</h2></div></div>
+  <div class="card"><div class="eyebrow">Batterie-Visualisierung</div><div class="battery"><div class="batteryfill" id="batteryFill"></div></div><h2 id="batteryPercent">Akku-Status nicht verfügbar</h2><p class="muted" id="batteryNote">Wenn dein Browser keine echten Akkudaten bereitstellt, zeigen wir keinen erfundenen Prozentwert an.</p><button class="action secondary" onclick="readBattery()">Akku-Status prüfen</button></div>
+</section>
+
+<section id="fps" class="page">
+  <div class="sectionhead"><button class="backbtn" onclick="showPage('home')">←</button><div><div class="eyebrow">Performance Lab</div><h2>FPS-Anzeige</h2></div></div>
+  <div class="card"><div class="muted">Gemessene Animationsrate dieser Seite</div><div class="fpsnum"><span id="fpsValue">--</span><span style="font-size:19px;color:#a8bfd8"> FPS</span></div><p class="muted">Das misst nur die Bildwiederholungen dieser Web-App – nicht die FPS in Roblox oder anderen Spielen.</p><div class="switchrow"><div><strong>Messung aktiv</strong><div class="muted">Läuft, solange diese Ansicht geöffnet ist.</div></div><input id="fpsToggle" type="checkbox" checked onchange="fpsOn=this.checked"></div></div>
+</section>
+
+<section id="settings" class="page">
+  <div class="sectionhead"><button class="backbtn" onclick="showPage('home')">←</button><div><div class="eyebrow">Personalisieren</div><h2>Einstellungen</h2></div></div>
+  <div class="card">
+    <label for="backgroundSelect">Hintergrund</label><select id="backgroundSelect" onchange="setBackground(this.value)"><option value="galaxy">Sternenhimmel / Galaxie</option><option value="ocean">Unterwasserwelt</option></select>
+    <label for="layoutSelect">Layout</label><select id="layoutSelect" onchange="setLayout(this.value)"><option value="dock">Dock-Layout – Kacheln kompakt</option><option value="full">Full-Screen-Layout – größere Kacheln</option></select>
+    <label for="tileOpacity">Kachel-Transparenz</label><input id="tileOpacity" type="range" min="35" max="95" value="78" oninput="setOpacity(this.value)"><div class="muted" id="opacityText">78% Deckkraft</div>
+    <label for="animationSpeed">Animationsgeschwindigkeit</label><input id="animationSpeed" type="range" min="40" max="180" value="100" oninput="setSpeed(this.value)"><div class="muted" id="speedText">Normal</div>
+    <div class="switchrow"><div><strong>Hintergrundanimationen</strong><div class="muted">Sterne, Galaxie und Fische bewegen</div></div><input id="animationToggle" type="checkbox" checked onchange="setAnimations(this.checked)"></div>
+  </div>
+  <div class="card muted">Die Einstellungen gelten in dieser Browser-Vorschau. Für dauerhafte Speicherung zwischen Sitzungen können wir als nächsten Schritt lokale Speicherung ergänzen.</div>
+</section>
+</main>
+<footer>Multi TaskMaker · Konzept-Vorschau<br>Eine HTML-Web-App, noch keine native iPhone-App.</footer>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const pages=[...document.querySelectorAll('.page')];
+function showPage(id){pages.forEach(p=>p.classList.toggle('active',p.id===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='asmr'){resetBubbles();makeColorBalls()}if(id==='fps')startFps();if(id!=='fps')lastFpsPage=false}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.style.display='none',2600)}
+function openGame(which){
+  const links={roblox:'roblox://',google:'googleapp://'};
+  const fallbacks={roblox:'https://apps.apple.com/app/roblox/id431946152',google:'https://apps.apple.com/app/google/id284815942'};
+  toast('Versuche, die App zu öffnen …');
+  // Launch the app's URL scheme; the App Store page is only a fallback if the user chooses it.
+  const start=Date.now();window.location.href=links[which];
+  setTimeout(()=>{if(Date.now()-start<2500){if(confirm('Hat sich die App nicht geöffnet? Du kannst ihre App-Store-Seite öffnen.'))window.location.href=fallbacks[which]}},1300);
+}
+const soundNames=[['Vine Boom','💥'],['Fah','⚡'],['Pump Shotgun','🔫'],['Explosion','🌋'],['Prowler','👁'],['Side Eye','👀'],['Quack','🦆'],['I Got That Feeling','🎵'],['Lachende Katze','🐱'],['Heheha','😂']];
+const soundRoot=document.getElementById('sounds');
+soundNames.forEach(([name,ico],i)=>{const b=document.createElement('button');b.className='action secondary sound';b.innerHTML='<span class="sicon">'+ico+'</span><span>'+name+'</span>';b.onclick=()=>playTone(i);soundRoot.appendChild(b)});
+function playTone(i){try{const ctx=new (window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator(),gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);const now=ctx.currentTime;const freqs=[95,180,70,55,130,420,650,330,510,220];osc.type=[ 'sawtooth','square','triangle','sawtooth','sine','sine','square','triangle','sine','square'][i];osc.frequency.setValueAtTime(freqs[i],now);if(i===0||i===3){osc.frequency.exponentialRampToValueAtTime(35,now+.35)}else if(i===6){osc.frequency.setValueAtTime(650,now);osc.frequency.exponentialRampToValueAtTime(900,now+.08);osc.frequency.exponentialRampToValueAtTime(500,now+.22)}else{osc.frequency.exponentialRampToValueAtTime(Math.max(40,freqs[i]*.55),now+.28)}gain.gain.setValueAtTime(.001,now);gain.gain.exponentialRampToValueAtTime(.16,now+.025);gain.gain.exponentialRampToValueAtTime(.001,now+.42);osc.start(now);osc.stop(now+.44);osc.onended=()=>ctx.close();toast(nameForSound(i)+' – Platzhalterton')}catch(e){toast('Audio konnte nicht gestartet werden. Tippe zuerst erneut auf den Button.')}}
+function nameForSound(i){return soundNames[i][0]}
+document.getElementById('audioFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const a=document.getElementById('customAudio');a.src=URL.createObjectURL(f);a.style.display='block';a.play().catch(()=>{});});
+function resetBubbles(){const area=document.getElementById('bubbleGame');if(!area)return;area.innerHTML='';for(let i=0;i<13;i++){const b=document.createElement('button');b.className='bubblebtn';b.style.position='absolute';b.style.left=(4+Math.random()*84)+'%';b.style.top=(5+Math.random()*68)+'%';b.style.width=(34+Math.random()*43)+'px';b.style.height=b.style.width;b.setAttribute('aria-label','Blase zerdrücken');b.onclick=()=>{b.animate([{transform:'scale(1)',opacity:1},{transform:'scale(1.5)',opacity:0}],{duration:180});setTimeout(()=>b.remove(),160);popSound()};area.appendChild(b)}}
+function popSound(){try{const c=new (window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.value=680;g.gain.value=.035;o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.045);o.onended=()=>c.close()}catch(e){}}
+function makeColorBalls(){const area=document.getElementById('colorGame');if(area.children.length)return;const colors=['#4fd1ff','#9b87ff','#ff78c7','#69e7a6','#ffca68'];colors.forEach(c=>{const b=document.createElement('button');b.className='orb';b.style.position='relative';b.style.width='48px';b.style.height='48px';b.style.background=c;b.style.display='block';b.onclick=()=>{const next=colors[Math.floor(Math.random()*colors.length)];b.style.background=next;b.style.boxShadow='0 0 22px '+next+'88';popSound()};area.appendChild(b)})}
+async function readBattery(){const title=document.getElementById('batteryPercent'),note=document.getElementById('batteryNote'),fill=document.getElementById('batteryFill');if(navigator.getBattery){try{const b=await navigator.getBattery();const p=Math.round(b.level*100);title.textContent='Akku: '+p+'%';note.textContent=b.charging?'Gerät wird geladen.':'Gerät wird gerade nicht als ladend gemeldet.';fill.style.width=p+'%';fill.style.background=p<20?'linear-gradient(90deg,#ff647e,#ffb36a)':'linear-gradient(90deg,#27d6b2,#6be8a2)';return}catch(e){}}title.textContent='Akku-Status nicht verfügbar';note.textContent='Dein iPhone-Browser stellt die echte Akkuladung hier nicht bereit.';fill.style.width='50%';toast('Echte Akkudaten sind in diesem Browser nicht verfügbar.')}
+let fpsOn=true,lastFpsPage=false,lastFrame=performance.now(),frames=0,lastReport=performance.now();
+function startFps(){lastFpsPage=true;lastFrame=performance.now();frames=0;lastReport=lastFrame;requestAnimationFrame(fpsLoop)}
+function fpsLoop(now){if(!lastFpsPage)return;if(now-lastFrame>0)frames++;if(now-lastReport>=700){document.getElementById('fpsValue').textContent=fpsOn?Math.round(frames*1000/(now-lastReport)):'—';frames=0;lastReport=now}lastFrame=now;requestAnimationFrame(fpsLoop)}
+function setBackground(v){const scene=document.getElementById('scene'),galaxy=document.getElementById('galaxy');document.querySelectorAll('.fish,.bubble').forEach(e=>e.remove());if(v==='ocean'){galaxy.style.display='none';scene.style.background='linear-gradient(180deg,#0b4567aa,#06233dcc)';for(let i=0;i<6;i++){const f=document.createElement('div');f.className='fish';f.textContent=['🐠','🐟','🐡'][i%3];f.style.top=(12+i*13)+'%';f.style.animationDelay=(-i*2.4)+'s';scene.appendChild(f)}for(let i=0;i<22;i++){const b=document.createElement('div');b.className='bubble';const size=4+Math.random()*12;b.style.width=size+'px';b.style.height=size+'px';b.style.left=Math.random()*100+'%';b.style.bottom=(-Math.random()*30)+'px';b.style.animationDelay=(-Math.random()*9)+'s';scene.appendChild(b)}}else{galaxy.style.display='block';scene.style.background='linear-gradient(180deg,rgba(4,10,23,.2),rgba(4,10,23,.58))';document.querySelectorAll('.star').forEach(e=>e.remove());for(let i=0;i<85;i++){const s=document.createElement('div');s.className='star';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDelay=(-Math.random()*4)+'s';scene.appendChild(s)}}}
+function setOpacity(v){document.documentElement.style.setProperty('--tile-alpha',(v/100).toFixed(2));document.getElementById('opacityText').textContent=v+'% Deckkraft'}
+function setSpeed(v){const scale=100/v;document.querySelectorAll('#galaxy,.fish,.bubble,.star').forEach(e=>{if(e.classList.contains('fish'))e.style.animationDuration=(17*scale)+'s';else if(e.classList.contains('bubble'))e.style.animationDuration=(9*scale)+'s';else if(e.classList.contains('star'))e.style.animationDuration=(3*scale)+'s';else e.style.animationDuration=(42*scale)+'s'});document.getElementById('speedText').textContent=v<75?'Langsam':v>130?'Schnell':'Normal'}
+function setAnimations(on){document.getElementById('scene').style.animationPlayState=on?'running':'paused';document.querySelectorAll('#scene *').forEach(e=>e.style.animationPlayState=on?'running':'paused')}
+function setLayout(v){document.body.dataset.layout=v;document.querySelectorAll('.tile').forEach(t=>{t.style.minHeight=v==='full'?'170px':'';t.style.padding=v==='full'?'22px 18px':''});toast(v==='full'?'Full-Screen-Layout aktiviert':'Dock-Layout aktiviert')}
+function initStars(){for(let i=0;i<85;i++){const s=document.createElement('div');s.className='star';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDelay=(-Math.random()*4)+'s';document.getElementById('scene').appendChild(s)}}
+initStars();
+</script>
+</body>
+</html>
